@@ -6,7 +6,6 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class Day01 {
     public static void main(String[] args) throws IOException {
@@ -17,7 +16,6 @@ public class Day01 {
     }
 
     List<List<Integer>> loadInputFile() throws IOException {
-        List<List<Integer>> cals = new ArrayList<>();
         var inStr = Files.readString(Path.of("src/main/resources/day01.txt"));
         return loadInputString(inStr);
     }
@@ -51,7 +49,7 @@ public class Day01 {
                 stream().
                 map(l -> l.stream().mapToInt(i -> i).sum()).
                 sorted(Comparator.reverseOrder()).
-                collect(Collectors.toList());
+                toList();
         return sorted.get(0) + sorted.get(1) + sorted.get(2);
     }
 }
