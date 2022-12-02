@@ -14,23 +14,12 @@ public class Day02 {
     public int score(List<String> lines) {
         int total = 0;
         for (String line : lines) {
-            var split = line.split(" ");
-            String them = split[0];
-            String me = split[1];
-            int score = points.get(me);
-            if (them.equals("A") && me.equals("Y") ||  // them: rock, me: paper
-                    them.equals("B") && me.equals("Z") ||  // them: paper, me: scissors
-                    them.equals("C") && me.equals("X")) {  // them: scissors, me: rock
-                score += 6; // I win
-            } else if ((them.equals("A") && me.equals("Z")) || // them: rock, me: scissors
-                    (them.equals("B") && me.equals("X")) || // them: paper, me: rock
-                    (them.equals("C") && me.equals("Y"))) { // them: scissors, me: paper
-                score += 0; // I lose
-            } else if ((them.equals("A") && me.equals("X")) || // them: rock, me: rock
-                (them.equals("B") && me.equals("Y")) || // them: paper, me: paper
-                (them.equals("C") && me.equals("Z"))) { // them: scissors, me: scissors
-                score += 3; // draw
-            }
+            int score = points.get(line.substring(2));
+            score += switch (line) {
+                case "A Y", "B Z", "C X" -> 6; // I win
+                case "A X", "B Y", "C Z" -> 3; // draw
+                default -> 0;
+            };
             total += score;
         }
         return total;
@@ -39,23 +28,13 @@ public class Day02 {
     public int score2(List<String> lines) {
         int total = 0;
         for (String line : lines) {
-            var split = line.split(" ");
-            String them = split[0];
-            String outcome = split[1];
-            int score = outcomeScore.get(outcome);
-            if (them.equals("A") && outcome.equals("Y") ||  // them: rock, outcome: draw -> me: rock
-                    them.equals("B") && outcome.equals("X") ||  // them: paper, outcome: lose -> me: rock
-                    them.equals("C") && outcome.equals("Z")) {  // them: scissors, outcome: win -> me: rock
-                score += points.get("X"); // rock
-            } else if ((them.equals("A") && outcome.equals("Z")) || // them: rock, outcome: win -> me: paper
-                    (them.equals("B") && outcome.equals("Y")) || // them: paper, outcome: draw -> me: paper
-                    (them.equals("C") && outcome.equals("X"))) { // them: scissors, outcome: lose -> me: paper
-                score += points.get("Y"); // paper
-            } else if ((them.equals("A") && outcome.equals("X")) || // them: rock, outcome: lose -> me: scissors
-                    (them.equals("B") && outcome.equals("Z")) || // them: paper, outcome: win -> me: scissors
-                    (them.equals("C") && outcome.equals("Y"))) { // them: scissors, outcome: draw -> me: scissors
-                score += points.get("Z"); // scissors
-            }
+            int score = outcomeScore.get(line.substring(2));
+            score += switch (line) {
+                case "A Y", "B X", "C Z" -> points.get("X"); // rock
+                case "A Z", "B Y", "C X" -> points.get("Y"); // paper
+                case "A X", "B Z", "C Y" -> points.get("Z"); // scissors
+                default -> 0;
+            };
             total += score;
         }
         return total;
