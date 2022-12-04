@@ -19,4 +19,10 @@ class Day04Test {
         var day4 = new Day04();
         assertThat(day4.countFullyContains(example)).isEqualTo(2);
     }
+
+    @Test
+    void solvesPart2Example() {
+        var day4 = new Day04();
+        assertThat(day4.countHasOverlap(example)).isEqualTo(4);
+    }
 }
