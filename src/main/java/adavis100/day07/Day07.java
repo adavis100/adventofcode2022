@@ -8,6 +8,24 @@ import java.util.Arrays;
 import java.util.List;
 
 public class Day07 {
+    static class Dir {
+        String name;
+        int size;
+        List<Dir> children;
+
+        Dir parent;
+
+        Dir(String name) {
+            this.name = name;
+            this.children = new ArrayList<>();
+        }
+
+        Dir(String name, Dir parent) {
+            this(name);
+            this.parent = parent;
+        }
+    }
+
     public Dir buildTree(List<String> lines) {
         Dir cwd = null, root = null;
         for (String line : lines) {
@@ -29,14 +47,14 @@ public class Day07 {
             }
         }
 
-        getTotalSizes(root);
+        countTotalSizes(root);
 
         return root;
     }
 
-    private int getTotalSizes(Dir dir) {
+    private int countTotalSizes(Dir dir) {
         for (Dir child : dir.children) {
-            dir.size += getTotalSizes(child);
+            dir.size += countTotalSizes(child);
         }
         return dir.size;
     }
@@ -61,37 +79,20 @@ public class Day07 {
         Dir root = buildTree(lines);
         int free = 70000000 - root.size;
         int needed = 30000000 - free;
-        getSmallestDirBiggerThan(root, needed);
-        return smallest;
+        return getSmallestDirBiggerThan(root, needed, Integer.MAX_VALUE);
     }
 
-    private int smallest = Integer.MAX_VALUE;
-
-    private void getSmallestDirBiggerThan(Dir dir, int needed) {
-       if (dir.size >= needed && dir.size < smallest) {
-           smallest = dir.size;
-       }
-       for (Dir child : dir.children) {
-           getSmallestDirBiggerThan(child, needed);
-       }
-    }
-
-    static class Dir {
-        String name;
-        int size;
-        List<Dir> children;
-
-        Dir parent;
-
-        Dir(String name) {
-            this.name = name;
-            this.children = new ArrayList<>();
+    private int getSmallestDirBiggerThan(Dir dir, int needed, int currentSmallest) {
+        if (dir.size >= needed && dir.size < currentSmallest) {
+            currentSmallest = dir.size;
         }
-
-        Dir(String name, Dir parent) {
-            this(name);
-            this.parent = parent;
+        for (Dir child : dir.children) {
+            int smallest = getSmallestDirBiggerThan(child, needed, currentSmallest);
+            if (smallest < currentSmallest) {
+                currentSmallest = smallest;
+            }
         }
+        return currentSmallest;
     }
 
     public static void main(String[] args) throws IOException {
