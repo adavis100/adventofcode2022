@@ -10,25 +10,26 @@ import java.util.Set;
 
 public class Day09 {
     record Coord(int x, int y) {}
-    Set<Coord> visited = new HashSet<>();
-
-    Day09() {
-        visited.add(new Coord(0,0));
-    }
+    Set<Coord> visited;
 
     int simulateMovesPart1(List<String> moves) {
-        return simulateMoves(moves, new Coord[] {new Coord(0, 0), new Coord(0,0)});
+        return simulateMoves(moves, 2);
     }
 
     int simulateMovesPart2(List<String> moves) {
-        var knots = new Coord[10];
-        for (int i = 0; i < 10; i++) {
-            knots[i] = new Coord(0, 0);
-        }
-        return simulateMoves(moves, knots);
+
+        return simulateMoves(moves, 10);
     }
 
-    int simulateMoves(List<String> moves, Coord[] knots) {
+    int simulateMoves(List<String> moves, int numKnots) {
+        visited = new HashSet<>();
+        visited.add(new Coord(0,0));
+
+        var knots = new Coord[numKnots];
+        for (int i = 0; i < numKnots; i++) {
+            knots[i] = new Coord(0, 0);
+        }
+
         for (String move : moves) {
             String dir = move.split(" ")[0];
             int spaces = Integer.parseInt(move.split(" ")[1]);
@@ -86,7 +87,6 @@ public class Day09 {
         var lines = Arrays.asList(inStr.split("\n"));
         Day09 day09 = new Day09();
         System.out.println("part 1: " + day09.simulateMovesPart1(lines));
-        day09 = new Day09();
         System.out.println("part 2: " + day09.simulateMovesPart2(lines));
     }
 }
