@@ -19,9 +19,9 @@ class Day09Test {
     @MethodSource
     void doesSingleMove(String dir, int count, Coord startHead, Coord expectedPos) {
         Day09 day09 = new Day09();
-        day09.headPos = startHead;
-        day09.move(dir, count);
-        assertThat(day09.tailPos).isEqualTo(expectedPos);
+        Coord[] headTail = new Coord[] {new Coord(0,0), startHead};
+        day09.move(dir, count, headTail);
+        assertThat(headTail[0]).isEqualTo(expectedPos);
     }
 
     private static Stream<Arguments> doesSingleMove() {
@@ -42,6 +42,26 @@ class Day09Test {
     @Test
     void solvesFirstExample() {
         Day09 day09 = new Day09();
-        assertThat(day09.simulateMoves(in)).isEqualTo(13);
+        assertThat(day09.simulateMovesPart1(in)).isEqualTo(13);
+    }
+
+    @Test
+    void solvesSecondExample() {
+        Day09 day09 = new Day09();
+        assertThat(day09.simulateMovesPart2(in)).isEqualTo(1);
+    }
+
+    @Test
+    void solvesBiggerSecondExample() {
+        Day09 day09 = new Day09();
+        List<String> in = List.of("R 5",
+                "U 8",
+                "L 8",
+                "D 3",
+                "R 17",
+                "D 10",
+                "L 25",
+                "U 20");
+        assertThat(day09.simulateMovesPart2(in)).isEqualTo(36);
     }
 }

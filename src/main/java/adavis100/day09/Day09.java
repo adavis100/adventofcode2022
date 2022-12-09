@@ -11,23 +11,33 @@ import java.util.Set;
 public class Day09 {
     record Coord(int x, int y) {}
     Set<Coord> visited = new HashSet<>();
-    Coord headPos = new Coord(0, 0);
-    Coord tailPos = new Coord(0, 0);
 
     Day09() {
         visited.add(new Coord(0,0));
     }
 
-    int simulateMoves(List<String> moves) {
+    int simulateMovesPart1(List<String> moves) {
+        return simulateMoves(moves, new Coord[] {new Coord(0, 0), new Coord(0,0)});
+    }
+
+    int simulateMovesPart2(List<String> moves) {
+        var knots = new Coord[10];
+        for (int i = 0; i < 10; i++) {
+            knots[i] = new Coord(0, 0);
+        }
+        return simulateMoves(moves, knots);
+    }
+
+    int simulateMoves(List<String> moves, Coord[] knots) {
         for (String move : moves) {
             String dir = move.split(" ")[0];
             int spaces = Integer.parseInt(move.split(" ")[1]);
-            move(dir, spaces);
+            move(dir, spaces, knots);
         }
         return visited.size();
     }
 
-    void move(String dir, int spaces) {
+    void move(String dir, int spaces, Coord[] knots) {
         int xmod = 0, ymod = 0;
         switch (dir) {
             case "R" -> xmod = 1;
@@ -36,9 +46,11 @@ public class Day09 {
             case "D" -> ymod = -1;
         }
         for (int i = 0; i < spaces; i++) {
-            headPos = new Coord(headPos.x() + xmod, headPos.y() + ymod);
-            tailPos = catchUp(headPos, tailPos);
-            visited.add(tailPos);
+            knots[knots.length - 1] = new Coord(knots[knots.length - 1].x() + xmod, knots[knots.length - 1].y() + ymod);
+            for (int knotIndex = knots.length - 1; knotIndex > 0; knotIndex--) {
+                knots[knotIndex - 1] = catchUp(knots[knotIndex], knots[knotIndex - 1]);
+            }
+            visited.add(knots[0]);
         }
     }
 
@@ -73,7 +85,8 @@ public class Day09 {
         var inStr = Files.readString(Path.of("src/main/resources/day09.txt"));
         var lines = Arrays.asList(inStr.split("\n"));
         Day09 day09 = new Day09();
-        System.out.println("part 1: " + day09.simulateMoves(lines));
-//        System.out.println("part 2: " + day09.getMaxScenicScore());
+        System.out.println("part 1: " + day09.simulateMovesPart1(lines));
+        day09 = new Day09();
+        System.out.println("part 2: " + day09.simulateMovesPart2(lines));
     }
 }
