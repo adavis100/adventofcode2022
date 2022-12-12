@@ -81,3 +81,6 @@ buildNumber.properties
 .idea/artifacts/
 .idea/modules.xml
 .idea/vcs.xml
+
+# vim swap files
+.sw*
