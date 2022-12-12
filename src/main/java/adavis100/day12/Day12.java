@@ -4,13 +4,12 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
-import java.util.stream.Collectors;
 
 
 public class Day12 {
     record Position(int x, int y) {}
+    private static final Position MARKER = new Position(-1, -1);
 
-    final Position marker = new Position(-1, -1);
     public int getShortestPathLengthPart1(String in) {
         char[][] grid = loadGrid(in);
         Position start = findStart(grid);
@@ -44,16 +43,16 @@ public class Day12 {
         grid[end.x][end.y] = 'z';
         Deque<Position> queue = new ArrayDeque<>();
         queue.add(start);
-        queue.add(marker);
+        queue.add(MARKER);
         visited.add(start);
         int dist = 0;
 
         while (queue.size() > 0) {
             Position cur = queue.remove();
-            if (cur.equals(marker)) {
+            if (cur.equals(MARKER)) {
                 dist++;
                 if (!queue.isEmpty()) {
-                    queue.add(marker);
+                    queue.add(MARKER);
                 }
                 continue;
             } else if (cur.equals(end)) {
