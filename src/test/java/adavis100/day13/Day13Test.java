@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import static adavis100.day13.Day13.Packet;
-import static org.assertj.core.api.Assertions.as;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 
@@ -81,7 +80,11 @@ class Day13Test {
                 arguments("[7,7,7,7]", "[7,7,7]", false),
                 arguments("[]", "[3]", true),
                 arguments("[[[]]]", "[[]]", false),
-                arguments("[1,[2,[3,[4,[5,6,7]]]],8,9]", "[1,[2,[3,[4,[5,6,0]]]],8,9]", false)
+                arguments("[1,[2,[3,[4,[5,6,7]]]],8,9]", "[1,[2,[3,[4,[5,6,0]]]],8,9]", false),
+                arguments("[[7,[[4,10],5],7,6,1],[[],10,6,[]],[[7,[3],[7,6,1,8,1],5,[]],[5,2,[7,2,8,3],7]]]",
+                        "[[4,10,9]]", false),
+                arguments("[[[],5,[[5,2],[2,3,2,8],[2,5,6,2],6],[2,[1,7,0],[8,9,8,8,7],1],4],[8,[2,1,[]],9]]",
+                        "[[10]]", true)
         );
     }
 
@@ -89,5 +92,11 @@ class Day13Test {
     void solvesFirstExample() {
         Day13 day13 = new Day13();
         assertThat(day13.solvePart1(in)).isEqualTo(13);
+    }
+
+    @Test
+    void solvesSecondExample() {
+        Day13 day13 = new Day13();
+        assertThat(day13.solvePart2(in)).isEqualTo(140);
     }
 }

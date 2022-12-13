@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -52,7 +53,8 @@ public class Day13 {
         }
     }
 
-    record ParseResponse(Packet packet, String remaining) {}
+    record ParseResponse(Packet packet, String remaining) {
+    }
 
     public Packet parsePacket(String s) {
         var parsed = parsePacketHelper(s.substring(1), new Packet());
@@ -66,7 +68,7 @@ public class Day13 {
             p.add(Packet.of(n));
             return parsePacketHelper(s.substring(2), p);
         } else if (Character.isDigit(head)) {
-            int n = Integer.parseInt(s.substring(0 , 1));
+            int n = Integer.parseInt(s.substring(0, 1));
             p.add(Packet.of(n));
             return parsePacketHelper(s.substring(1), p);
         } else if (head == '[') {
@@ -81,36 +83,28 @@ public class Day13 {
     }
 
     public int compare(Packet l, Packet r) {
-        if (l.val >= 0 && r.val >= 0) {
+        if (l.val >= 0 && r.val >= 0) { // both nums
             return l.val - r.val;
-        } else if (l.elements.size() == 0 && l.val < 0 && r.elements.size() > 0) {
-            return -1;
-        } else if (l.elements.size() > 0 && r.elements.size() == 0 && r.val < 0) {
-            return 1;
-        } else if (l.elements.size() > 0 && r.elements.size() > 0) {
-            int first = compare(l.elements.get(0), r.elements.get(0));
-            if (first == 0) {
-                return compare(Packet.of(l.elements.subList(1, l.elements.size())), Packet.of(r.elements.subList(1, r.elements.size())));
+        } else if (l.val < 0 && r.val < 0) {
+            for (int i = 0; i < Math.min(l.elements.size(), r.elements.size()); i++) {
+                int comp = compare(l.elements.get(i), r.elements.get(i));
+                if (comp != 0) {
+                    return comp;
+                }
             }
-            return first;
-        } else if (l.elements.size() > 0 && r.val >= 0) {
-            return compare(l, Packet.of(List.of(Packet.of(r.val))));
-        } else if (l.val >= 0 && r.elements.size() > 0) {
+            return l.elements.size() - r.elements.size();
+        } else if (l.val >= 0) {
             return compare(Packet.of(List.of(Packet.of(l.val))), r);
-        } else if (l.elements.size() == 0 && r.elements.size() > 0) {
-            return -1;
-        } else if (l.elements.size() > 0 && r.elements.size() == 0) {
-            return 1;
-        } else { // l.elements.size() == 0 && r.elements.size() == 0
-            return 0;
+        } else { // r.val >= 0
+            return compare(l, Packet.of(List.of(Packet.of(r.val))));
         }
     }
 
     public int solvePart1(String in) {
-        String []lines = in.split("\n");
+        String[] lines = in.split("\n");
         List<Packet> left = new ArrayList<>();
         List<Packet> right = new ArrayList<>();
-        for (int i =0; i < lines.length; i++) {
+        for (int i = 0; i < lines.length; i++) {
             if (!lines[i].isEmpty()) {
                 left.add(parsePacket(lines[i++]));
                 right.add(parsePacket(lines[i]));
@@ -119,17 +113,36 @@ public class Day13 {
 
         int total = 0;
         for (int i = 0; i < left.size(); i++) {
-            if (compare(left.get(i), right.get(i)) < 0) {
+            int cmp = compare(left.get(i), right.get(i));
+            if (cmp < 0) {
                 total += i + 1;
             }
         }
         return total;
     }
 
+    public int solvePart2(String in) {
+        String[] lines = in.split("\n");
+        List<Packet> packets = new ArrayList<>();
+        for (int i = 0; i < lines.length; i++) {
+            if (!lines[i].isEmpty()) {
+                packets.add(parsePacket(lines[i]));
+            }
+        }
+        Packet divider1 = Packet.of(List.of(Packet.of(2)));
+        Packet divider2 = Packet.of(List.of(Packet.of(6)));
+        packets.add(divider1);
+        packets.add(divider2);
+        Collections.sort(packets, (p1, p2) -> compare(p1, p2));
+        int index1 = packets.indexOf(divider1) + 1;
+        int index2 = packets.indexOf(divider2) + 1;
+        return index1 * index2;
+    }
+
     public static void main(String[] args) throws IOException {
         var inStr = Files.readString(Path.of("src/main/resources/day13.txt"));
         Day13 day13 = new Day13();
         System.out.println("part 1: " + day13.solvePart1(inStr));
-//        System.out.println("part 2: " + day13.getShortestPathLengthPart2(inStr));
+        System.out.println("part 2: " + day13.solvePart2(inStr));
     }
 }
