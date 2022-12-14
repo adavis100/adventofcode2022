@@ -7,12 +7,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Day14 {
-    record Coord(int x, int y) {}
+    record Coord(int x, int y) {
+    }
 
     static int solvePart1(String in) {
-        boolean [][]grid = new boolean[1000][1000];
+        boolean[][] grid = new boolean[1000][1000];
         addPaths(grid, in);
-        return simulateSand(grid);
+        return simulateSand(grid, false);
     }
 
     private static void addPaths(boolean[][] grid, String in) {
@@ -27,7 +28,7 @@ public class Day14 {
     private static List<Coord> parseCoords(String line) {
         var coords = new ArrayList<Coord>();
         for (String s : line.split(" -> ")) {
-            coords.add(new Coord(Integer.valueOf(s.split(",")[0]), Integer.valueOf(s.split(",")[1])));
+            coords.add(new Coord(Integer.parseInt(s.split(",")[0]), Integer.parseInt(s.split(",")[1])));
         }
         return coords;
     }
@@ -56,19 +57,24 @@ public class Day14 {
         grid[to.x][to.y] = true;
     }
 
-    private static int simulateSand(boolean[][] grid) {
+    private static int simulateSand(boolean[][] grid, boolean fillSandToTop) {
         int sandCount = 0;
-        while (addSand(grid)) {
+        while (addSand(grid, fillSandToTop)) {
             sandCount++;
         }
         return sandCount;
     }
 
-    private static boolean addSand(boolean[][] grid) {
+    private static boolean addSand(boolean[][] grid, boolean fillSandToStart) {
         Coord sandPos = new Coord(500, 0);
         while (inBounds(sandPos) && !blocked(sandPos, grid)) {
-            sandPos = move(sandPos, grid);
+            sandPos = moveOneStep(sandPos, grid);
         }
+
+        if (fillSandToStart && sandPos.x == 500 && sandPos.y == 0) {
+            return false;
+        }
+
         return inBounds(sandPos) && blocked(sandPos, grid);
     }
 
@@ -80,7 +86,7 @@ public class Day14 {
         return grid[sandPos.x][sandPos.y + 1] && grid[sandPos.x - 1][sandPos.y + 1] && grid[sandPos.x + 1][sandPos.y + 1];
     }
 
-    private static Coord move(Coord sandPos, boolean[][] grid) {
+    private static Coord moveOneStep(Coord sandPos, boolean[][] grid) {
         grid[sandPos.x][sandPos.y] = false;
         if (!grid[sandPos.x][sandPos.y + 1]) {
             grid[sandPos.x][sandPos.y + 1] = true;
@@ -94,9 +100,40 @@ public class Day14 {
         }
     }
 
+    static int solvePart2(String in) {
+        boolean[][] grid = new boolean[1000][1000];
+        addPaths(grid, in);
+        int maxY = findMaxY(grid);
+        addFloor(grid, maxY + 2);
+        return simulateSand(grid, true) + 1;
+    }
+
+
+    private static int findMaxY(boolean[][] grid) {
+        for (int y = grid[0].length - 1; y >= 0; y--) {
+            boolean hasStuff = false;
+            for (int x = 0; x < grid.length; x++) {
+                if (grid[x][y]) {
+                    hasStuff = true;
+                    break;
+                }
+            }
+            if (hasStuff) {
+                return y;
+            }
+        }
+        return -1;
+    }
+
+    private static void addFloor(boolean[][] grid, int y) {
+        for (int x = 0; x < grid.length; x++) {
+            grid[x][y] = true;
+        }
+    }
+
     public static void main(String[] args) throws IOException {
         var inStr = Files.readString(Path.of("src/main/resources/day14.txt"));
         System.out.println("part 1: " + solvePart1(inStr));
-//        System.out.println("part 2: " + solvePart2(inStr));
+        System.out.println("part 2: " + solvePart2(inStr));
     }
 }
