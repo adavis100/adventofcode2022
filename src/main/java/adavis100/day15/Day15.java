@@ -16,11 +16,11 @@ public class Day15 {
         int maxX = findMaxX(sensors) + 20000000;
         int count = 0;
         for (int x = minX; x <= maxX; x++) {
-            var pos = new Coord(x,y);
+            var coord = new Coord(x,y);
             for (Sensor sensor : sensors) {
-                if (pos.equals(sensor.closestBeacon)) {
+                if (coord.equals(sensor.closestBeacon)) {
                     break;
-                } else if (dist(sensor.position, pos) <= dist(sensor.position, sensor.closestBeacon)) {
+                } else if (dist(sensor.position, coord) <= dist(sensor.position, sensor.closestBeacon)) {
                     count++;
                     break;
                 }
@@ -56,9 +56,75 @@ public class Day15 {
         return sensors.stream().mapToInt(i -> i.closestBeacon.x).max().orElseThrow();
     }
 
+    static long solvePart2(String in, int maxCoord) {
+        var sensors = loadSensors(in);
+        boolean found = false;
+        int minx = 0;
+        int maxx = maxCoord;
+        int miny = 0;
+        int maxy = maxCoord;
+        boolean goingLeft = true, goingRight = false, goingUp = false, goingDown = false;
+        int x = 0, y = 0;
+        long freq = 0;
+        long iterations = 0;
+        while (!found) {
+            Coord coord = new Coord(x, y);
+            boolean couldHaveBeacon = true;
+            for (Sensor sensor : sensors) {
+                if (coord.equals(sensor.closestBeacon) ||
+                        dist(sensor.position, coord) <= dist(sensor.position, sensor.closestBeacon)) {
+                    couldHaveBeacon = false;
+                    break;
+                }
+            }
+            if (couldHaveBeacon) {
+                found = true;
+                freq = tuningFrequency(coord);
+            }
+            if (goingLeft && x < maxx) {
+                x++;
+            } else if (goingLeft) {
+                goingLeft = false;
+                goingDown = true;
+                y++;
+                miny++;
+            } else if (goingDown && y < maxy) {
+                y++;
+            } else if (goingDown) {
+                goingDown = false;
+                goingRight = true;
+                maxx--;
+                x--;
+            } else if (goingRight && x > minx) {
+                x--;
+            } else if (goingRight) {
+                goingRight = false;
+                goingUp = true;
+                maxy--;
+                y--;
+            } else if (goingUp && y > miny) {
+                y--;
+            } else {
+                goingUp = false;
+                goingLeft = true;
+                minx++;
+                x++;
+            }
+            iterations++;
+            if (iterations % 1000000000L == 0) {
+                System.out.println(iterations + ": minx=" + minx + ", maxx=" + maxx + ", miny=" + miny + ", maxy=" + maxy);
+            }
+        }
+        return freq;
+    }
+
+    private static long tuningFrequency(Coord coord) {
+        return coord.x * 4000000L + coord.y;
+    }
+
     public static void main(String[] args) throws IOException {
         var inStr = Files.readString(Path.of("src/main/resources/day15.txt"));
         System.out.println("part 1: " + solvePart1(inStr, 2000000));
-//        System.out.println("part 2: " + solvePart2(inStr));
+        System.out.println("part 2: " + solvePart2(inStr, 4000000));
     }
 }

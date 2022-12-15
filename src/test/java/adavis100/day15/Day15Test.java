@@ -26,4 +26,10 @@ class Day15Test {
     void solvesExample1() {
         assertThat(solvePart1(exampleIn, 10)).isEqualTo(26);
     }
+
+    @Test
+    void solvesExample2() {
+        assertThat(solvePart2(exampleIn, 20)).isEqualTo(56000011);
+    }
+
 }
